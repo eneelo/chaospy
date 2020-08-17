@@ -74,6 +74,7 @@ from .collection import *
 from .copulas import *
 from .evaluation import *
 from .constructor import construct
+from .kde import GaussianKDE
 
 from . import (
     sampler, evaluation, approximation,

@@ -81,7 +81,7 @@ class GaussianKDE(Dist):
         # The Scott factor is taken from scipy docs.
         if bandwidth2 in ("scott", "silverman"):
             qrange = numpy.quantile(self.samples, [0.25, 0.75], axis=1).ptp(axis=0)
-            scale = min(numpy.std(samples, axis=1), qrange/1.34)
+            scale = numpy.min([numpy.std(samples, axis=1), qrange/1.34], axis=0)
             if bandwidth2 == "scott":
                 scott_factor = self.samples.shape[1]**(-1./(self.dim+4))
             else:
