@@ -3,16 +3,21 @@
    :width: 200 px
    :align: center
 
-|circleci| |codecov| |pypi| |readthedocs|
+|circleci| |codecov| |readthedocs| |license| |pypi| |downloads| |python-version|
 
 .. |circleci| image:: https://circleci.com/gh/jonathf/chaospy/tree/master.svg?style=shield
     :target: https://circleci.com/gh/jonathf/chaospy/tree/master
-.. |codecov| image:: https://codecov.io/gh/jonathf/chaospy/branch/master/graph/badge.svg
+.. |codecov| image:: https://img.shields.io/codecov/c/github/jonathf/chaospy
     :target: https://codecov.io/gh/jonathf/chaospy
-.. |pypi| image:: https://badge.fury.io/py/chaospy.svg
-    :target: https://badge.fury.io/py/chaospy
 .. |readthedocs| image:: https://readthedocs.org/projects/chaospy/badge/?version=master
     :target: http://chaospy.readthedocs.io/en/master/?badge=master
+.. |license| image:: https://img.shields.io/pypi/l/chaospy
+    :target: https://opensource.org/licenses/MIT
+.. |pypi| image:: https://badge.fury.io/py/chaospy.svg
+    :target: https://badge.fury.io/py/chaospy
+.. |downloads| image:: https://img.shields.io/pypi/dw/chaospy
+    :target: https://pypistats.org/packages/chaospy
+.. |python-version| image:: https://img.shields.io/pypi/pyversions/chaospy
 
 Chaospy is a numerical tool for performing uncertainty quantification using
 polynomial chaos expansions and advanced Monte Carlo methods implemented in
@@ -40,32 +45,55 @@ point collocation method will look as follows:
     import numpy
     import chaospy
 
-    # your code wrapper goes here
+Wrap your code in a function:
+
+.. code-block:: python
+
     coordinates = numpy.linspace(0, 10, 100)
     def foo(coordinates, params):
         """Function to do uncertainty quantification on."""
         param_init, param_rate = params
         return param_init*numpy.e**(-param_rate*coordinates)
 
-    # bi-variate probability distribution
+Construct a multivariate probability distribution:
+
+.. code-block:: python
+
     distribution = chaospy.J(chaospy.Uniform(1, 2), chaospy.Uniform(0.1, 0.2))
 
-    # polynomial chaos expansion
+Construct polynomial chaos expansion:
+
+.. code-block:: python
+
     polynomial_expansion = chaospy.generate_expansion(8, distribution)
 
-    # samples:
-    samples = distribution.sample(1000)
+Generate random samples from for example Halton low-discrepancy sequence:
 
-    # evaluations:
+.. code-block:: python
+
+    samples = distribution.sample(1000, rule="halton")
+
+Evaluate function for each sample:
+
+.. code-block:: python
+
     evals = numpy.array([foo(coordinates, sample) for sample in samples.T])
 
-    # polynomial approximation
+Bring the parts together using point collocation method:
+
+.. code-block:: python
+
     foo_approx = chaospy.fit_regression(
         polynomial_expansion, samples, evals)
 
-    # statistical metrics
+Derive statistics from model approximation:
+
+.. code-block:: python
+
     expected = chaospy.E(foo_approx, distribution)
     deviation = chaospy.Std(foo_approx, distribution)
+    sobol_main = chaospy.Sens_m(foo_approx, distribution)
+    sobol_total = chaospy.Sens_t(foo_approx, distribution)
 
 For a more extensive guides on what is going on, see the `tutorial collection`_.
 
